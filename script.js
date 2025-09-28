@@ -36,7 +36,6 @@ function appendToDisplay(input) {
     errorMode = false;
   }
   display.value += input;
-  display.scrollLeft = display.scrollWidth;
 }
 
 function clearDisplay() {
@@ -44,7 +43,6 @@ function clearDisplay() {
   display.value = "";
   display.style.color = ""; // ✅ Reset text color on clear
   errorMode = false;
-  display.scrollLeft = 0;
 }
 
 function setOperation(operator) {
@@ -55,7 +53,6 @@ function setOperation(operator) {
     errorMode = false;
   }
   display.value += operator;
-  display.scrollLeft = display.scrollWidth;
 }
 
 function clearone() {
@@ -246,13 +243,11 @@ function calculateResult() {
       errorMode = false; // ✅ Reset error mode
       notification("Calculation successful !", "success");
     }
-    display.scrollLeft = display.scrollWidth;
   } catch (error) {
     display.value = "Error";
     display.style.color = "red";
     notification("Invalid Expression !");
     errorMode = true;
-    display.scrollLeft = display.scrollWidth;
   }
 }
 

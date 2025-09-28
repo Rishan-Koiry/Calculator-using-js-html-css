@@ -98,64 +98,10 @@
       overflow-x: auto;
       overflow-y: hidden;
       white-space: nowrap;
-      /* Force scrollbar to always show when content overflows */
-      scrollbar-width: thin;
-      scrollbar-color: rgba(255, 255, 255, 0.4) rgba(255, 255, 255, 0.08);
-      /* Ensure proper scrolling behavior */
-      scroll-behavior: smooth;
     }
 
     #display:focus {
       background: linear-gradient(145deg, #1e1e23, #28282d);
-    }
-
-    /* Enhanced scrollbar for display - more visible for error messages */
-    #display::-webkit-scrollbar {
-      height: 10px;
-      background: rgba(255, 255, 255, 0.08);
-      border-radius: 5px;
-    }
-
-    #display::-webkit-scrollbar-track {
-      background: rgba(0, 0, 0, 0.2);
-      border-radius: 5px;
-      margin: 0 4px;
-      border: 1px solid rgba(255, 255, 255, 0.05);
-    }
-
-    #display::-webkit-scrollbar-thumb {
-      background: linear-gradient(
-        90deg,
-        rgba(255, 255, 255, 0.4),
-        rgba(255, 255, 255, 0.6)
-      );
-      border-radius: 5px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    }
-
-    #display::-webkit-scrollbar-thumb:hover {
-      background: linear-gradient(
-        90deg,
-        rgba(255, 255, 255, 0.6),
-        rgba(255, 255, 255, 0.8)
-      );
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-    }
-
-    #display::-webkit-scrollbar-thumb:active {
-      background: linear-gradient(
-        90deg,
-        rgba(255, 255, 255, 0.7),
-        rgba(255, 255, 255, 0.9)
-      );
-      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
-    }
-
-    /* Firefox scrollbar styling */
-    #display {
-      scrollbar-width: thin;
-      scrollbar-color: rgba(255, 255, 255, 0.3) rgba(255, 255, 255, 0.05);
     }
 
     #keys {
