@@ -596,7 +596,10 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
             margin-bottom: 25px;
             cursor: pointer;
+            transition: transform 0.6s ease;
           "
+          onmouseover="this.style.transform='rotate(360deg)'"
+          onmouseout="this.style.transform='rotate(0deg)'"
         />
       </div>
       <div style="position: relative; padding-top: 25px">

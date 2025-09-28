@@ -2,18 +2,21 @@ const display = document.getElementById("display");
 let errorMode = false;
 const clickSound = new Audio("click.mp3");
 const resultSound = new Audio("result.mp3");
+
 function playClickSound() {
   clickSound.currentTime = 0;
   clickSound.play().catch((e) => {
     console.log("Audio play failed:", e);
   });
 }
+
 function playResultSound() {
   resultSound.currentTime = 0;
   resultSound.play().catch((e) => {
     console.log("Audio play failed:", e);
   });
 }
+
 function notification(message, type = "error") {
   const notificationElement = document.getElementById("notification");
   if (!notificationElement) return;
@@ -24,22 +27,23 @@ function notification(message, type = "error") {
     notificationElement.classList.remove("show");
   }, 3000);
 }
+
 function appendToDisplay(input) {
   playClickSound();
   if (errorMode) {
     display.value = "";
-    display.style.color = "";
+    display.style.color = ""; // ✅ Reset text color if in error mode
     errorMode = false;
   }
   display.value += input;
-
   display.scrollLeft = display.scrollWidth;
 }
+
 function clearDisplay() {
   playClickSound();
   display.value = "";
+  display.style.color = ""; // ✅ Reset text color on clear
   errorMode = false;
-
   display.scrollLeft = 0;
 }
 
@@ -47,13 +51,13 @@ function setOperation(operator) {
   playClickSound();
   if (errorMode) {
     display.value = "";
-    display.style.color = "";
+    display.style.color = ""; // ✅ Reset color before adding operator
     errorMode = false;
   }
   display.value += operator;
-
   display.scrollLeft = display.scrollWidth;
 }
+
 function clearone() {
   playClickSound();
   if (errorMode) {
@@ -61,17 +65,18 @@ function clearone() {
   }
   display.value = display.value.slice(0, -1);
 }
+
 function showFormulaWindow() {
   playClickSound();
   if (errorMode) {
     return;
   }
   let existingDiv = document.getElementById("formula-window");
-
   if (existingDiv) {
     existingDiv.style.display = "block";
     return;
   }
+
   const overlay = document.createElement("div");
   overlay.id = "formula-overlay";
   overlay.style.cssText = `
@@ -104,7 +109,7 @@ function showFormulaWindow() {
 
   formulaDiv.innerHTML = `
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-      <h2 style="margin: 0; color: #333; font-size: 24px;">Common Formulas</h2>
+      <h2 id="formula-title" style="margin: 0; color: #333; font-size: 24px;">Common Formulas</h2>
       <button id="close-formula-window" style="
         background: #f0f0f0;
         border: none;
@@ -186,25 +191,20 @@ function showFormulaWindow() {
         <div><strong>30. Heat Transfer:</strong> Q = mcΔT</div>
       </div>
     </div>
-
-  </div>
   `;
 
   overlay.appendChild(formulaDiv);
   document.body.appendChild(overlay);
 
-  // Enhanced close functionality
   const closeWindow = () => {
     playResultSound();
     overlay.remove();
   };
 
-  // Multiple ways to close
   document.getElementById("close-formula-window").onclick = closeWindow;
 
   overlay.onclick = (e) => {
     if (e.target === overlay) {
-      playResultSound();
       closeWindow();
     }
   };
@@ -212,7 +212,6 @@ function showFormulaWindow() {
   const handleKeydown = (e) => {
     if (e.key === "Escape") {
       closeWindow();
-
       document.removeEventListener("keydown", handleKeydown);
     }
   };
@@ -223,12 +222,12 @@ function showFormulaWindow() {
   formulaDiv.tabIndex = -1;
   formulaDiv.focus();
 }
+
 function calculateResult() {
   playResultSound();
   if (errorMode) {
     return;
   }
-
   try {
     const result = eval(display.value);
     if (isNaN(result)) {
@@ -243,22 +242,22 @@ function calculateResult() {
       errorMode = true;
     } else {
       display.value = result;
+      display.style.color = ""; // ✅ Reset color after success
+      errorMode = false; // ✅ Reset error mode
       notification("Calculation successful !", "success");
     }
-
     display.scrollLeft = display.scrollWidth;
   } catch (error) {
     display.value = "Error";
     display.style.color = "red";
     notification("Invalid Expression !");
     errorMode = true;
-
     display.scrollLeft = display.scrollWidth;
   }
 }
+
 function copyResult() {
   const displayValue = display.value;
-
   if (!displayValue || displayValue === "" || displayValue === "0") {
     notification("No result to copy!", "info");
     return;
