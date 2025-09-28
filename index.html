@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link rel="icon" type="image/png" href="logo.png" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RK Modern Calculator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 20px 20px 100px 20px;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Roboto, sans-serif;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(
+          circle at 20% 50%,
+          rgba(120, 119, 198, 0.3) 0%,
+          transparent 50%
+        ),
+        radial-gradient(
+          circle at 80% 20%,
+          rgba(255, 119, 198, 0.3) 0%,
+          transparent 50%
+        ),
+        radial-gradient(
+          circle at 40% 80%,
+          rgba(120, 219, 255, 0.3) 0%,
+          transparent 50%
+        );
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    #calculator {
+      font-family: "Inter", sans-serif;
+      max-width: 420px;
+      width: 100%;
+      background: rgba(30, 30, 35, 0.95);
+      backdrop-filter: blur(20px) saturate(180%);
+      border-radius: 28px;
+      box-shadow: 0 32px 64px rgba(0, 0, 0, 0.4), 0 16px 32px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+      position: relative;
+      z-index: 1;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    #calculator:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 40px 80px rgba(0, 0, 0, 0.5), 0 20px 40px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    }
+
+    #display {
+      width: 100%;
+      height: 120px;
+      padding: 32px 28px;
+      font-size: 3.2rem;
+      font-weight: 300;
+      border: none;
+      background: linear-gradient(145deg, #1a1a1f, #242429);
+      color: #ffffff;
+      text-align: right;
+      outline: none;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      font-family: "Inter", monospace;
+      letter-spacing: -0.02em;
+      transition: all 0.2s ease;
+      overflow-x: auto;
+      overflow-y: hidden;
+      white-space: nowrap;
+      /* Force scrollbar to always show when content overflows */
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255, 255, 255, 0.4) rgba(255, 255, 255, 0.08);
+      /* Ensure proper scrolling behavior */
+      scroll-behavior: smooth;
+    }
+
+    #display:focus {
+      background: linear-gradient(145deg, #1e1e23, #28282d);
+    }
+
+    /* Enhanced scrollbar for display - more visible for error messages */
+    #display::-webkit-scrollbar {
+      height: 10px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 5px;
+    }
+
+    #display::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 5px;
+      margin: 0 4px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    #display::-webkit-scrollbar-thumb {
+      background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.4),
+        rgba(255, 255, 255, 0.6)
+      );
+      border-radius: 5px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    #display::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.6),
+        rgba(255, 255, 255, 0.8)
+      );
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    }
+
+    #display::-webkit-scrollbar-thumb:active {
+      background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.7),
+        rgba(255, 255, 255, 0.9)
+      );
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Firefox scrollbar styling */
+    #display {
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255, 255, 255, 0.3) rgba(255, 255, 255, 0.05);
+    }
+
+    #keys {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      padding: 28px;
+      background: rgba(26, 26, 31, 0.8);
+    }
+
+    button {
+      width: 100%;
+      height: 72px;
+      font-size: 1.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      border-radius: 20px;
+      border: none;
+      background: linear-gradient(145deg, #404040, #353535);
+      color: #ffffff;
+      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+      font-family: "Inter", sans-serif;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    button::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.1),
+        transparent
+      );
+      transition: left 0.5s;
+    }
+
+    button:hover::before {
+      left: 100%;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      background: linear-gradient(145deg, #4a4a4a, #3f3f3f);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    }
+
+    button:active {
+      transform: translateY(0);
+      background: linear-gradient(145deg, #303030, #2a2a2a);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3),
+        inset 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .operator {
+      background: linear-gradient(145deg, #ff6b35, #f7931e);
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    .operator:hover {
+      background: linear-gradient(145deg, #ff7849, #ff9f3d);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 24px rgba(255, 107, 53, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+
+    .operator:active {
+      background: linear-gradient(145deg, #e55a2b, #e6821a);
+      transform: translateY(-1px);
+    }
+
+    .clear {
+      background: linear-gradient(145deg, #6366f1, #8b5cf6);
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    .clear:hover {
+      background: linear-gradient(145deg, #7c3aed, #a855f7);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 24px rgba(139, 92, 246, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+
+    .clear:active {
+      background: linear-gradient(145deg, #5b21b6, #7c2d92);
+      transform: translateY(-1px);
+    }
+
+    /* Notification Styles */
+    #notification {
+      position: fixed;
+      top: 32px;
+      right: 32px;
+      background: linear-gradient(145deg, #ef4444, #dc2626);
+      color: white;
+      padding: 16px 24px;
+      border-radius: 16px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      box-shadow: 0 20px 40px rgba(239, 68, 68, 0.3),
+        0 8px 16px rgba(0, 0, 0, 0.2);
+      opacity: 0;
+      transform: translateX(120%) scale(0.9);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 1000;
+      max-width: 320px;
+      font-family: "Inter", sans-serif;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+    }
+
+    #notification.show {
+      opacity: 1;
+      transform: translateX(0) scale(1);
+    }
+
+    #notification.success {
+      background: linear-gradient(145deg, #10b981, #059669);
+      box-shadow: 0 20px 40px rgba(16, 185, 129, 0.3),
+        0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    #notification.warning {
+      background: linear-gradient(145deg, #f59e0b, #d97706);
+      box-shadow: 0 20px 40px rgba(245, 158, 11, 0.3),
+        0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    #display.disabled {
+      background: linear-gradient(145deg, #374151, #4b5563);
+      color: #9ca3af;
+      border-color: #6b7280;
+    }
+
+    /* Enhanced equals button styling */
+    .operator.last {
+      background: linear-gradient(145deg, #10b981, #059669) !important;
+      font-size: 2.2rem !important;
+      font-weight: 700 !important;
+    }
+
+    .operator.last:hover {
+      background: linear-gradient(145deg, #34d399, #10b981) !important;
+      box-shadow: 0 12px 24px rgba(16, 185, 129, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+    }
+
+    .operator.last:active {
+      background: linear-gradient(145deg, #047857, #065f46) !important;
+    }
+
+    /* Responsive design */
+    @media (max-width: 480px) {
+      body {
+        padding: 16px;
+      }
+
+      #calculator {
+        max-width: 100%;
+        border-radius: 24px;
+      }
+
+      #display {
+        font-size: 2.8rem;
+        height: 100px;
+        padding: 24px 20px;
+      }
+
+      #keys {
+        gap: 12px;
+        padding: 20px;
+      }
+
+      button {
+        height: 64px;
+        font-size: 1.6rem;
+        border-radius: 16px;
+      }
+
+      #notification {
+        top: 20px;
+        right: 20px;
+        left: 20px;
+        max-width: none;
+      }
+    }
+
+    /* Special button styling for formula button */
+    button:nth-child(17) {
+      background: linear-gradient(145deg, #8b5cf6, #7c3aed);
+      font-size: 1.5rem;
+    }
+
+    button:nth-child(17):hover {
+      background: linear-gradient(145deg, #a78bfa, #8b5cf6);
+      box-shadow: 0 12px 24px rgba(139, 92, 246, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+
+    /* Left Sticky Sidebar */
+    .left-sidebar {
+      position: fixed;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 60px;
+      height: auto;
+      background: rgba(30, 30, 35, 0.95);
+      backdrop-filter: blur(20px) saturate(180%);
+      border-radius: 0 24px 24px 0;
+      box-shadow: 8px 0 32px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-left: none;
+      z-index: 200;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow: hidden;
+    }
+
+    .left-sidebar:hover {
+      width: 280px;
+      box-shadow: 12px 0 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .sidebar-content {
+      padding: 24px 16px;
+      white-space: nowrap;
+      opacity: 1;
+      transition: all 0.3s ease;
+    }
+
+    .sidebar-icon {
+      width: 28px;
+      height: 28px;
+      margin: 0 auto 16px auto;
+      background: linear-gradient(145deg, #667eea, #764ba2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .left-sidebar:hover .sidebar-icon {
+      margin-bottom: 20px;
+      transform: scale(1.1);
+    }
+
+    .sidebar-expanded {
+      opacity: 0;
+      transform: translateX(-20px);
+      transition: all 0.4s ease 0.1s;
+      margin-top: 8px;
+    }
+
+    .left-sidebar:hover .sidebar-expanded {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .sidebar-title {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+      font-family: "Inter", sans-serif;
+      text-align: center;
+    }
+
+    .sidebar-subtitle {
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 0.8rem;
+      font-weight: 400;
+      margin-bottom: 20px;
+      font-family: "Inter", sans-serif;
+      text-align: center;
+      line-height: 1.4;
+    }
+
+    .social-links {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .social-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      text-decoration: none;
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 0.85rem;
+      font-weight: 500;
+      font-family: "Inter", sans-serif;
+      transition: all 0.2s ease;
+    }
+
+    .social-link:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.95);
+      transform: translateX(4px);
+    }
+
+    .social-icon {
+      font-size: 1.1rem;
+      width: 20px;
+      text-align: center;
+    }
+
+    .sidebar-info {
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-top: 16px;
+      text-align: center;
+    }
+
+    .info-item {
+      margin-bottom: 8px;
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.5);
+      font-family: "Inter", sans-serif;
+    }
+
+    .info-value {
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    /* Hide sidebar on mobile */
+    @media (max-width: 768px) {
+      .left-sidebar {
+        display: none;
+      }
+    }
+  </style>
+  <body>
+    <!-- Left Sticky Sidebar -->
+    <div class="left-sidebar">
+      <div class="sidebar-content">
+        <div class="sidebar-icon">
+          <img
+            src="pp.png"
+            alt="Profile"
+            style="
+              width: 28px;
+              height: 28px;
+              border-radius: 50%;
+              object-fit: cover;
+            "
+          />
+        </div>
+
+        <div class="sidebar-expanded">
+          <div class="sidebar-title">Rishan Koiry</div>
+          <div class="sidebar-subtitle">
+            Full Stack Developer<br />& Calculator Creator
+          </div>
+
+          <div class="social-links">
+            <a
+              href="https://rishankoiry.vercel.app"
+              target="_blank"
+              rel="noopener"
+              class="social-link"
+            >
+              <span class="social-icon">🌐</span>
+              <span>Portfolio</span>
+            </a>
+
+            <a
+              href="https://github.com/Rishan-Koiry"
+              target="_blank"
+              rel="noopener"
+              class="social-link"
+            >
+              <span class="social-icon">💻</span>
+              <span>GitHub</span>
+            </a>
+
+            <a
+              href="wa.me+8801932916688"
+              target="_blank"
+              rel="noopener"
+              class="social-link"
+            >
+              <span class="social-icon">🤙</span>
+              <span>Whatsapp</span>
+            </a>
+
+            <a href="mailto:rishankoiry1@gmail.com" class="social-link">
+              <span class="social-icon">📧</span>
+              <span>Email</span>
+            </a>
+          </div>
+
+          <div class="sidebar-info">
+            <div class="info-item">
+              Project: <span class="info-value">Calculator</span>
+            </div>
+            <div class="info-item">
+              Version: <span class="info-value">ES6</span>
+            </div>
+            <div class="info-item">
+              Year: <span class="info-value">2025</span>
+            </div>
+            <div class="info-item">Made with ❤️</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="calculator">
+      <div style="position: absolute; top: 19px; left: 20px; z-index: 2">
+        <img
+          src="logo.png"
+          alt="Logo"
+          onclick="copyResult()"
+          style="
+            height: 38px;
+            width: auto;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+            margin-bottom: 25px;
+            cursor: pointer;
+          "
+        />
+      </div>
+      <div style="position: relative; padding-top: 25px">
+        <input type="text" id="display" readonly placeholder="0" />
+        <div
+          style="
+            position: absolute;
+            top: 12px;
+            right: 28px;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.4);
+            font-weight: 300;
+            letter-spacing: 0.1em;
+            user-select: none;
+            margin-top: 4px;
+          "
+        >
+          CALCULATOR
+        </div>
+      </div>
+      <div id="keys">
+        <button onclick="appendToDisplay('7')" title="Seven">7</button>
+        <button onclick="appendToDisplay('8')" title="Eight">8</button>
+        <button onclick="appendToDisplay('9')" title="Nine">9</button>
+        <button class="operator" onclick="setOperation('/')" title="Divide">
+          /
+        </button>
+
+        <button onclick="appendToDisplay('4')" title="Four">4</button>
+        <button onclick="appendToDisplay('5')" title="Five">5</button>
+        <button onclick="appendToDisplay('6')" title="Six">6</button>
+        <button class="operator" onclick="setOperation('*')" title="Multiply">
+          *
+        </button>
+
+        <button onclick="appendToDisplay('1')" title="One">1</button>
+        <button onclick="appendToDisplay('2')" title="Two">2</button>
+        <button onclick="appendToDisplay('3')" title="Three">3</button>
+        <button class="operator" onclick="setOperation('-')" title="Subtract">
+          −
+        </button>
+
+        <button
+          onclick="appendToDisplay('0')"
+          title="Zero"
+          style="font-size: 1.9rem"
+        >
+          0
+        </button>
+        <button onclick="appendToDisplay('.')" title="Decimal">•</button>
+        <button class="clear" id="clear" onclick="clearDisplay()" title="Clear">
+          AC
+        </button>
+        <button class="operator" onclick="setOperation('+')" title="Add">
+          +
+        </button>
+
+        <button
+          onclick="showFormulaWindow()"
+          title="Formulas"
+          style="font-size: 1.4rem"
+        >
+          📐
+        </button>
+        <button class="clear" onclick="clearone()" title="All Clear">C</button>
+        <button
+          class="operator"
+          onclick="appendToDisplay('(')"
+          title="Open Parenthesis"
+        >
+          (
+        </button>
+        <button
+          class="operator"
+          onclick="appendToDisplay(')')"
+          title="Close Parenthesis"
+        >
+          )
+        </button>
+      </div>
+      <div
+        style="
+          display: flex;
+          justify-content: center;
+          padding: 0 28px 28px 28px;
+        "
+      >
+        <button
+          class="operator last"
+          id="equals"
+          onclick="calculateResult()"
+          title="Calculate Result"
+          style="
+            width: 100%;
+            height: 72px;
+            font-size: 2.2rem;
+            font-weight: 700;
+            border-radius: 20px;
+            letter-spacing: 0.1em;
+          "
+        >
+          =
+        </button>
+      </div>
+    </div>
+    <div id="notification"></div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
